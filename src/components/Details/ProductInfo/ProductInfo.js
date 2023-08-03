@@ -3,7 +3,7 @@ import { Row, Tabs, Tab, Image, OverlayTrigger , Tooltip} from 'react-bootstrap'
 import { BsHeart, BsHeartFill } from 'react-icons/bs';
 import { wishProduct } from '../../../services/productData'
 
-function ProductInfo({ params }) {
+function ProductInfo({ params, shopDetails }) {
     const [wish, setWish] = useState(false);
 
     useEffect(() => {
@@ -29,7 +29,8 @@ function ProductInfo({ params }) {
                 .catch(err => console.log(err))
         }
     }
-
+    console.log(shopDetails);
+    const shopdetail = shopDetails[0];
     return (
         <>
             <Image className="col-lg-12" src={params.image} rounded />
@@ -57,7 +58,7 @@ function ProductInfo({ params }) {
                     <Tab eventKey="details" title="Details" id="tab-details">
                         {params.description}
                         <hr />
-                        <p id="details-footer" className="text-muted">Product listed at {params.addedAt}</p>
+                        <p id="details-footer" className="text-muted">Shop Address {shopdetail.description}</p>
                     </Tab>
                     {/* <Tab eventKey="aboutSeller" title="About seller">
                         <p>Name: {params.name || "Not specified"}</p>

@@ -5,7 +5,7 @@ import SimpleSider from '../components/Siders/SimpleSider';
 import Breadcrumb from '../components/Details/Breadcrumb'
 import ProductInfo from '../components/Details/ProductInfo/ProductInfo';
 import Aside from '../components/Details/Aside/Aside';
-import { getSpecific, getOwnerInfoByShopAddress } from '../services/productData';
+import { getSpecific, getOwnerInfoByShopAddress, getShopInfoByShopAddress } from '../services/productData';
 import '../components/Details/ProductInfo/ProductInfo.css';
 import '../components/Details/Aside/Aside.css';
 
@@ -16,6 +16,7 @@ function Details({ match, history }) {
     let [product, setProduct] = useState([]);
     let [shopOwner, setShopOwner] = useState(null);
     let [loading, setLoading] = useState(true);
+    let [shopDetails, setShopDetails] = useState(null);
     
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -28,6 +29,13 @@ function Details({ match, history }) {
             })
             .catch(err => console.log(err));
 
+        getShopInfoByShopAddress(shopAddress)
+        .then(res => {
+            console.log(res);
+            setShopDetails(res);
+        })
+        .catch(err => console.log(err));
+
         // Fetch shop owner information
         getOwnerInfoByShopAddress(shopAddress)
             .then(res => {
@@ -35,7 +43,10 @@ function Details({ match, history }) {
             })
             .catch(err => console.log(err));
     }, [productId, shopAddress]);
-    
+    if (shopDetails == null) {
+        return <div>Loading...</div>;
+    }
+    console.log(shopDetails);
     return (
         <>
             <SimpleSider />
@@ -45,10 +56,10 @@ function Details({ match, history }) {
                     <Breadcrumb params={product} />
                     <Row>
                         <Col lg={8} id="detailsProduct">
-                            <ProductInfo params={product} />
+                            <ProductInfo params={product} shopDetails={shopDetails}  />
                         </Col>
                         <Col lg={4}>
-                            <Aside params={product} history={history}  shopinfo={shopinfo} shopOwner={shopOwner}/>
+                            <Aside params={product} history={history}  shopinfo={shopinfo} shopOwner={shopOwner} shopDetails={shopDetails}/>
                         </Col>
                     </Row></>) : (<Spinner animation="border" />)}
             </div>

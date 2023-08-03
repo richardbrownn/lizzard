@@ -15,7 +15,7 @@ import { isUserExists } from '../../../services/userData';
 import './Aside.css';
 
 
-function Aside({ params, history, shopinfo, shopOwner }) {
+function Aside({ params, history, shopinfo, shopOwner, shopDetails }) {
     const [showMsg, setShowMdg] = useState(false);
     const [showArchive, setShowArchive] = useState(false);
     const [message, setMessage] = useState("");
@@ -67,13 +67,11 @@ function Aside({ params, history, shopinfo, shopOwner }) {
     if (user === null || shopOwner == null) {
         return <div>Loading...</div>;
     }
-    const ownerinfo = shopOwner[0];
-    const failedDeals = shopOwner[1];
-    const successfulDeals = shopOwner[2];
+    console.log(shopDetails);
+    const shopdetail = shopDetails[0];
 
-    console.log(ownerinfo.username);
-    console.log(shopinfo[0]);
-    console.log(user.shop);
+    const failedDeals = shopDetails[1];
+    const successfulDeals = shopDetails[2];
     return (
         <aside>
             <div className="product-details-seller">
@@ -101,13 +99,13 @@ function Aside({ params, history, shopinfo, shopOwner }) {
                             <RiMessage3Fill />Contact Seller
                         </Button>
                     }
-                    <Link to={`/profile/${user ? user.address : params.sellerId}`}>
+                    <Link to={`/profile/${shopdetail ?  shopdetail.ownerAddress : params.sellerId}`}>
                         <Col lg={12}>
-                            <img id="avatar" src={ownerinfo.profilePic} alt="user-avatar" />
+                            <img id="avatar" src={shopdetail.shopPic} alt="user-avatar" />
                         </Col>
                         <Col lg={12}>
-                            <p><BsFillPersonFill /> {ownerinfo.username}</p>
-                            <p><MdEmail /> {ownerinfo.userAddress}</p>
+                            <p><BsFillPersonFill /> {shopdetail.shopName}</p>
+                            <p><MdEmail /> {shopdetail.description}</p>
                             <p><FaSellsy /> {ethers.utils.formatUnits(successfulDeals, "ether")} Successful sells in total</p>
                             <p><FaSellsy /> {ethers.utils.formatUnits(failedDeals, "ether")} Failed sells in total</p>
                         </Col>

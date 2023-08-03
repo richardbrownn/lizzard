@@ -1,7 +1,11 @@
 import { ethers } from 'ethers';
 import MarketHubABI from '../contracts/MarketHubABI.json';
 import ShopContractABI from '../contracts/ShopContractABI.json';
+const contractAddress = '0xFA3969E17D11F252bEd39BD16A6d9f98dB38Df84';
+const providerUrl = 'https://node1.neuronnetwork.space';
 const baseUrl = 'http://localhost:5000';
+const provider = new ethers.providers.JsonRpcProvider(providerUrl);
+const contract = new ethers.Contract(contractAddress, MarketHubABI, provider);
 
 export async function getAll(page, category, query) {
     if (query !== "" && query !== undefined) {
@@ -58,8 +62,17 @@ export const getOwnerInfoByShopAddress = async (shopAddress) => {
     const shopContract = new ethers.Contract(shopAddress, ShopContractABI, provider);
     const shopOwner =  await shopContract.shopOwner();
     const markethubContract = new ethers.Contract(await shopContract.marketHubContract(), MarketHubABI, provider);
+    const ownerinfo = await markethubContract.users(shopOwner);
+    return [ownerinfo];
+}
+
+export const getShopInfoByShopAddress = async (shopAddress) => {
+    const provider = new ethers.providers.JsonRpcProvider('https://node1.neuronnetwork.space');
+    const shopContract = new ethers.Contract(shopAddress, ShopContractABI, provider);
+    const markethubContract = new ethers.Contract(await shopContract.marketHubContract(), MarketHubABI, provider);
     const failedDeals = await shopContract.failedDeals();
     const successfulDeals = await  shopContract.successfulDeals();
-    const ownerinfo = await markethubContract.users(shopOwner);
-    return [ownerinfo, failedDeals, successfulDeals];
+    const shopinfo = await markethubContract.shops(shopAddress);
+    return [shopinfo, failedDeals, successfulDeals];
 }
+
