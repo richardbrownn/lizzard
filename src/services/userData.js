@@ -112,7 +112,8 @@ export async function getUser() {
 }
 
 export async function getUserActiveSells(id) {
-    return (await fetch(`${baseUrl}/products/sells/active/${id}`, {credentials: 'include'})).json();
+    const activedeals = await contract.getActiveDealsCountByUser(id)
+    return activedeals;
 }
 
 export async function getUserArchivedSells() {
@@ -144,21 +145,49 @@ export async function getUserById(id) {
                 const wallet = new ethers.Wallet(decryptedPrivateKey, provider);
                 const contractWithSigner = contract.connect(wallet);
                 const user = await contractWithSigner.users(id);
+                const image = user.profilePic ? user.profilePic.toString() : 'undefined.JPG'; 
                 console.log(id);
                 console.log(user.userAddress);
                 console.log(user.publicKey);
-                return { 
-                    user: {
+                if (user.shopAddress !== "0x0000000000000000000000000000000000000000") {
+                    const shopContract = new ethers.Contract(user.shopAddress, shopContractABI, provider);
+                    const shopContractWithSigner = shopContract.connect(wallet);
+                    const successfulDeals = await shopContractWithSigner.successfulDeals();
+                    const failedDeals = await shopContractWithSigner.failedDeals();
+            
+                    return { 
+                        user: {
                         _id: user.userAddress,
-                        username: user.username,
+                        username: user.username, 
+                        address: user.userAddress, 
                         publicKey: user.publicKey,
+                        image: image,
+                        shop: user.shopAddress,
+                        successfulDeals: successfulDeals.toNumber(), 
+                        failedDeals: failedDeals.toNumber(),
                         isAdmin: user.isAdmin,
                         isModerator: user.isModerator,
                         isBanned: user.isBanned,
                         shopAddress: user.shopAddress,
-                        image: user.profilePic
-                    } 
-                };
+                        }
+                    };
+                } else {
+                    return { 
+                        user: {
+                        _id: user.userAddress,
+                        username: user.username, 
+                        address: user.userAddress, 
+                        publicKey: user.publicKey,
+                        image: image,
+                        shop: user.shopAddress,
+                        _id: user.userAddress,
+                        isAdmin: user.isAdmin,
+                        isModerator: user.isModerator,
+                        isBanned: user.isBanned,
+                        shopAddress: user.shopAddress
+                        }
+                    };
+                }
             }
             else {
                 return { error: { message: "Could not decrypt the private key" } };
@@ -207,7 +236,7 @@ export const userIsShop = async (address) => {
     console.log(user.userAddress);
     console.log(user.publicKey);
     if (user.shopAddress != "0x0000000000000000000000000000000000000000"){
-        return true;
+        return user.shopAddress;
     } else {
         return false;
     }

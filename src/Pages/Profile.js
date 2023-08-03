@@ -16,6 +16,7 @@ function Profile({ match, history }) {
     const [wishlist, setWishlist] = useState(false);
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const address = match.params.id;
 
     const provider = new ethers.providers.JsonRpcProvider('https://node1.neuronnetwork.space');
 
@@ -72,14 +73,15 @@ function Profile({ match, history }) {
             })
     }, [match.params.id]);
     
-    if (loading) {
+    if (loading || !address) {
         return <div>Loading...</div>;
     }
+    console.log(address);
     return (
         <>
             {user && user.isMe ? (
                 <>
-                <ProfileSection params={user} />
+                <ProfileSection params={user} match={match} address={address}/>
                 <div className="container">
                     <Row>
                         <Col lg={2} sm={12} id="aside">
@@ -96,7 +98,7 @@ function Profile({ match, history }) {
                 </div>
                 </>
             ) : ( 
-                <SellerProfile params={user} history={history}/>
+                <SellerProfile params={user} history={history}  match={match} address={address}/>
             )}
 
         </>

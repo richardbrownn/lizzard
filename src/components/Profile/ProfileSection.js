@@ -4,23 +4,37 @@ import { BsFillPersonFill } from 'react-icons/bs';
 import { MdEmail, MdPhoneAndroid } from 'react-icons/md'
 import { FaSellsy } from 'react-icons/fa'
 import { GrEdit } from 'react-icons/gr';
-import { useContext, useEffect, useState } from 'react';
-import { isUserExists } from '../../services/userData';
-function ProfileSection({ params }) {
+import { useContext, useEffect, useState} from 'react';
+import { getUserById } from '../../services/userData';
+import { getShopInfoByShopAddress } from '../../services/productData';
+function ProfileSection({ params, address }) {
     const [ userData, setUserData] = useState("");
+    const [ shopData, setShopData ] = useState(null);
     useEffect(() => {
         async function fetchUserData() {
-            const response = await isUserExists();
-            if (response && response.exists) {
-                setUserData(response);
+            const response = await getUserById(address);
+            if (response.user && response.user._id) {
+                console.log(response);
+                
+                if (response.user.shopAddress) {
+                    const shopinfo = await getShopInfoByShopAddress(response.user.shopAddress);
+                    console.log(shopinfo);
+                    setShopData(shopinfo[0]);
+                } else {
+                    setShopData(null);
+                    // или показать сообщение, что у пользователя нет магазина
+                }
+                setUserData(response.user);
             }
         }
     
         fetchUserData();
-    }, [setUserData]);
-    if (params === null) {
+    }, [setUserData, userData, setShopData, shopData]);
+    
+    if (params === null || userData === null) {
         return <div>Loading...</div>;
     }
+    console.log(userData, shopData)
     return (
         <div id="profile-head">
             <div className="container">

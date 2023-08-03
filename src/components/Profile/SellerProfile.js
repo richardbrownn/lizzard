@@ -6,24 +6,36 @@ import { MdEmail, MdPhoneAndroid } from 'react-icons/md';
 import { FaSellsy } from 'react-icons/fa'
 import { RiMessage3Fill } from 'react-icons/ri';
 import { createChatRoom } from '../../services/messagesData'
-import { isUserExists } from '../../services/userData';
-
-function SellerProfile({ params, history }) {
+import { getUserById } from '../../services/userData';
+import { getShopInfoByShopAddress } from '../../services/productData';
+function SellerProfile({ params, history, address }) {
     const [showMsg, setShowMdg] = useState(false);
     const [message, setMessage] = useState("");
     const handleClose = () => setShowMdg(false);
     const handleShow = () => setShowMdg(true);
     const [ userData, setUserData] = useState("");
+    const [ shopData, setShopData ] = useState(null);
     useEffect(() => {
         async function fetchUserData() {
-            const response = await isUserExists();
-            if (response && response.exists) {
-                setUserData(response);
+            const response = await getUserById(address);
+            if (response.user && response.user._id) {
+                console.log(response);
+                
+                if (response.user.shopAddress) {
+                    const shopinfo = await getShopInfoByShopAddress(response.user.shopAddress);
+                    console.log(shopinfo);
+                    setShopData(shopinfo[0]);
+                } else {
+                    setShopData(null);
+                    // или показать сообщение, что у пользователя нет магазина
+                }
+                setUserData(response.user);
             }
         }
     
         fetchUserData();
-    }, [setUserData]);
+    }, [setUserData, userData, setShopData, shopData]);
+
     const handleMsgChange = (e) => {
         e.preventDefault();
         setMessage(e.target.value)
@@ -37,9 +49,10 @@ function SellerProfile({ params, history }) {
             })
             .catch(err => console.log(err))
     }
-    if (params === null) {
+    if (params === null || userData === null) {
         return <div>Loading...</div>;
     }
+    console.log(userData, shopData)
     return (
         <>
             <div id="profile-head">
@@ -49,15 +62,24 @@ function SellerProfile({ params, history }) {
                         <img id="avatar" alt="avatar" src={userData.image} />
                         </Col>
                         <Col lg={2} md={3} sm={12}>
-                            <p><BsFillPersonFill /> {userData.username}</p>
-                            <p><MdEmail /> {userData.address}</p>
-                            <p><FaSellsy/>{userData.successfulDeals} Successful sells in total</p>
-                            <p><FaSellsy/>{userData.failedDeals}  Failed sells in total</p>
-                        </Col>
-                        <Col lg={3} md={4} sm={12}>
-                            <Button variant="dark" className="col-lg-10" id="btnContact" onClick={handleShow}>
-                                <RiMessage3Fill />Contact Seller
-                            </Button>
+                        {shopData ? (
+                                <>
+                                    <h2>Информация о магазине</h2>
+                                    <p><BsFillPersonFill /> {shopData.shopName}</p>
+                                    <p><MdEmail /> {shopData.shopContractAddress }</p>
+                                    <p><FaSellsy/>{userData.successfulDeals} Успешных продаж всего</p>
+                                    <p><FaSellsy/>{userData.failedDeals}  Проваленных продаж всего</p>
+                                </>
+                            ) : (
+                                <>
+                                    <h2>Информация о пользователе</h2>
+                                    <p><BsFillPersonFill /> {userData.username}</p>
+                                    <p><MdEmail /> {userData.address}</p>
+                                    <p><FaSellsy/>{userData.successfulDeals} Успешных покупок всего</p>
+                                    <p><FaSellsy/>{userData.failedDeals}  Проваленных покупок всего</p>
+                                </>
+                            )}
+
                         </Col>
                     </Row>
                 </div>
