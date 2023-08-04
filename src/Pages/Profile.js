@@ -90,7 +90,7 @@ function Profile({ match, history }) {
                             <Button variant="dark" id="wishlist" onClick={handleWish}>Wishlist</Button>{' '}
                         </Col>
                         <Col lg={10} sm={12}>
-                            {active && <ActiveSells params={user}/>}
+                            {active && <ActiveSells address={address}/>}
                             {archived && <ArchivedSells history={history} />}
                             {wishlist && <Wishlist />}
                         </Col>

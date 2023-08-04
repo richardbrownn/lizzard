@@ -87,7 +87,7 @@ function SellerProfile({ params, history, address }) {
             <div className="container">
                 <Row>
                     <Col lg={12}>
-                        <ActiveSells params={params} />
+                        <ActiveSells address={address} />
                     </Col>
                 </Row>
             </div>

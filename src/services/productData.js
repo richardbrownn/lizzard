@@ -70,9 +70,20 @@ export const getShopInfoByShopAddress = async (shopAddress) => {
     const provider = new ethers.providers.JsonRpcProvider('https://node1.neuronnetwork.space');
     const shopContract = new ethers.Contract(shopAddress, ShopContractABI, provider);
     const markethubContract = new ethers.Contract(await shopContract.marketHubContract(), MarketHubABI, provider);
+
     const failedDeals = await shopContract.failedDeals();
     const successfulDeals = await  shopContract.successfulDeals();
     const shopinfo = await markethubContract.shops(shopAddress);
-    return [shopinfo, failedDeals, successfulDeals];
-}
+    const productCount = await shopContract.productId();
 
+    // create an array to store product info
+    const products = [];
+
+    // loop over each product id and get the product info
+    for(let i = 0; i < productCount; i++) {
+        const productInfo = await shopContract.products(i); // Assuming 'products' is a method in your contract that retrieves product details by id
+        products.push(productInfo);
+    }
+
+    return [shopinfo, failedDeals, successfulDeals, products];
+}
