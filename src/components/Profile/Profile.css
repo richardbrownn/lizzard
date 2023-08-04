@@ -57,5 +57,23 @@
 @media (min-width: 840px) {
     .profile-row, .col-md-3 {
         text-align: left;
+        width: white;
     }
+}
+
+/* Styling for Header */
+header {
+    color: black; /* White color for the text for visibility */
+   }
+   
+header a {
+    color: black; /* White color for links for visibility */
+    text-decoration: none; /* Removing the underline */
+}
+   
+   /* Styling for Footer */
+footer {
+    color: black; /* White color for the text for visibility */
+    text-align: center;
+    padding: 15px 0; /* Giving some vertical padding */
 }

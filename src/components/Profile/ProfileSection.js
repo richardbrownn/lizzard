@@ -7,6 +7,7 @@ import { GrEdit } from 'react-icons/gr';
 import { useContext, useEffect, useState} from 'react';
 import { getUserById } from '../../services/userData';
 import { getShopInfoByShopAddress } from '../../services/productData';
+
 function ProfileSection({ params, address }) {
     const [ userData, setUserData] = useState("");
     const [ shopData, setShopData ] = useState(null);
@@ -36,25 +37,45 @@ function ProfileSection({ params, address }) {
     }
     console.log(userData, shopData)
     return (
-        <div id="profile-head">
-            <div className="container">
-                <Row className="profile-row">
-                    <Col lg={2} md={5} sm={12}>
-                    <img id="avatar" alt="avatar" src={userData.image} />
-                    </Col>
-                    <Col lg={3} md={3} sm={12}>
+        <>
+        <header>
+            <nav>
+                <ul>
+                    <li><Link to="/catalog">Каталог</Link></li>
+                    <li><Link to="/shops">Магазины</Link></li>
+                    <li><Link to="/exchange">Обмен</Link></li>
+                    <li style={{ float: 'right' }}>
+                        <Link to="/profile"><BsFillPersonFill /></Link>
+                        <Link to="/notifications"><BsFillBellFill /></Link>
+                    </li>
+                </ul>
+             </nav>
+        </header>
+        <main>
+            <div id="profile-head">
+                <div className="container">
+                    <Row className="profile-row">
+                         <Col lg={2} md={5} sm={12}>
+                             <img id="avatar" alt="avatar" src={userData.image} />
+                        </Col>
+                     <Col lg={3} md={3} sm={12}>
                         <p><BsFillPersonFill /> {userData.username}</p>
                         <p><MdEmail /> {userData.address}</p>
-                        <p><FaSellsy/>{userData.successfulDeals} Successful sells in total</p>
-                        <p><FaSellsy/>{userData.failedDeals} Failed sells in total</p>
+                        <p><FaSellsy />{userData.successfulDeals} Successful sells in total</p>
+                        <p><FaSellsy />{userData.failedDeals} Failed sells in total</p>
                     </Col>
                     <span id="edit-icon">
                         <Link to={`/profile/${userData.address}/edit`}><GrEdit /></Link>
                     </span>
-                </Row>
+                     </Row>
+                 </div>
             </div>
-        </div>
-    )
+        </main>
+        <footer>
+            <p>2023 Все права защищены</p>
+        </footer>
+        </>
+        )
 }
-
+        
 export default ProfileSection;
